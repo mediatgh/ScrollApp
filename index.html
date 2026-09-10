@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <title>ScrollApp Test</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    #status {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      z-index: 10;
+
+      padding: 12px 16px;
+
+      border-radius: 10px;
+
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="status">Loading video...</div>
+
+  <video
+    id="video"
+    controls
+    playsinline
+    preload="auto"
+  ></video>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzqCpChfwsAkYFeshufiieV5ch1MlmmMVCNXvHQ8TKuYeUkXr_V-V5CH-U4MI9nKTXMGw/exec';
+
+    const video = document.getElementById('video');
+    const status = document.getElementById('status');
+
+    async function loadVideo() {
+      try {
+        const response = await fetch(API_URL);
+
+        if (!response.ok) {
+          throw new Error('Could not connect to Apps Script.');
+        }
+
+        const data = await response.json();
+
+        if (!data.url) {
+          throw new Error('Apps Script did not return a video URL.');
+        }
+
+        video.src = data.url;
+
+        status.textContent = 'Video loaded';
+
+        video.addEventListener('loadedmetadata', () => {
+          status.textContent = 'Video ready';
+        });
+
+        video.addEventListener('error', () => {
+          status.textContent = 'Video could not be played';
+        });
+
+      } catch (error) {
+        console.error(error);
+        status.textContent = 'Error loading video';
+      }
+    }
+
+    loadVideo();
+  </script>
+
+</body>
+</html>
